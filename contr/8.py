@@ -7,7 +7,7 @@ authors = []
 for quote in quotes: 
     quote = quote.split(' — '); 
     if "разум" in quote[0]:
-    c + = 1 
+        c += 1 
     authors.append(quote[1]) 
 
 print(c, "цитат со словом «разум» у следующих авторов") 
