@@ -1,0 +1,65 @@
+##1
+
+import os
+import re
+
+def open_xml(filename): 
+    ##читать по строкам
+    with open(filename, 'r', encoding = 'windows-1251') as f:
+        text = f.readlines()
+    return text
+
+def count_words(line_arr):
+    num = 0
+    for line in line_arr:
+        if '<w' in line:
+            num = num + 1 
+    return num
+
+src_folder = './news'
+res = []
+for root, _, files in os.walk(src_folder):
+    for sfile in files:
+        path = os.path.join(root, sfile)
+        lines = open_xml(path)
+        cnt = count_words(lines)
+        res.append({
+            'file': sfile,
+            'cnt': cnt
+        })
+
+with open('res.txt', 'w') as f:
+    for item in res:
+        f.write(str(item['file']) + '\t' + str(item['cnt']) + '\n')
+        
+        
+        ##2
+        
+import os
+import csv
+
+def getArticleInfo(line_arr):
+    info = {}
+    for line in line_arr:
+        if '<meta' in line:
+            content = re.search(r'content="(.*?)"', line).group(1)
+            if 'name="author"' in line:
+                info['author'] = content
+            elif 'name="created"' in line:
+                info['date'] = content
+            elif 'name="header"' in line:
+                info['name'] = content
+    return info
+
+for root, _, files in os.walk(src_folder):
+    with open('res.csv', 'w') as f:
+        wr = csv.writer(f, delimiter=',', quoting=csv.QUOTE_ALL)
+        wr.writerow(['Название файла', 'Автор', 'Дата создания текста'])
+        for sfile in files:
+            path = os.path.join(root, sfile)
+            lines = open_xml(path)
+            info = getArticleInfo(lines)
+            wr.writerow([info['name'], info['author'], info['date']])
+        
+        
+        ##3
